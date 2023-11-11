@@ -2,15 +2,26 @@
 
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import auth0 from './../auth0';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // Add your login logic here
+  const handleLogin = async () => {
+    try {
+      const credentials = await auth0.auth.passwordRealm({
+        username: email,
+        password: password,
+        realm: 'Username-Password-Authentication', // This may vary based on your Auth0 setup
+      });
+
+      console.log('Login Successful:', credentials);
+      // Add your logic after successful login
+    } catch (error) {
+      console.error('Login Failed:', error);
+      // Handle login failure
+    }
   };
 
   const navigateToRegister = () => {

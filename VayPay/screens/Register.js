@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import auth0 from '../auth0';
 
-const Register = () => {
+const Register = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -11,14 +12,20 @@ const Register = () => {
   const [country, setCountry] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegistration = () => {
-    console.log('First Name:', firstName);
-    console.log('Last Name:', lastName);
-    console.log('Email:', email);
-    console.log('Phone Number:', phoneNumber);
-    console.log('Country:', country);
-    console.log('Password:', password);
-    // Add your registration logic here
+  const handleRegistration = async () => {
+    try {
+      const credentials = await auth0.auth.createUser({
+        email,
+        password,
+        connection: 'Username-Password-Authentication', // This may vary based on your Auth0 setup
+      });
+
+      console.log('Registration Successful:', credentials);
+      // Add your logic after successful registration
+    } catch (error) {
+      console.error('Registration Failed:', error);
+      // Handle registration failure
+    }
   };
 
   return (
