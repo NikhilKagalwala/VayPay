@@ -30,11 +30,11 @@ const Login = ({ navigation }) => {
   
       const responseData = await response.json();
       console.log('Login Response from Flask:', responseData);
-
+      
       navigation.navigate('Main');
+
     } catch (error) {
       console.error('Error logging in:', error.message);
-      navigation.navigate('Main');
     }
   };
 

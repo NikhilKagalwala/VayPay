@@ -34,9 +34,7 @@ const postDataToFlask = async (data) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        data
-      }),
+      body: JSON.stringify({data}),
     });
 
     if (!response.ok) {
@@ -52,12 +50,6 @@ const postDataToFlask = async (data) => {
     // Handle the error
   }
 };
-
-// Call the functions
-// fetchDataFromFlask();
-// postDataToFlask();
-
-
 
 const Register = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');

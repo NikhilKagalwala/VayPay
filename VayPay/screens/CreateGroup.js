@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useVacationContext } from './VacationContext';
 
-
 const CreateGroup = ({ navigation }) => {
   const { addVacationGroup } = useVacationContext();
 
@@ -13,21 +12,59 @@ const CreateGroup = ({ navigation }) => {
   const [endDate, setEndDate] = useState('');
   const [groupPassword, setGroupPassword] = useState('');
 
-  const handleCreateGroup = () => {
-    // Implement logic to handle creating the group with the entered details-
-    const newGroup = {
-      vacationName,
-      startDate,
-      endDate,
-      groupPassword,
-    };
+  const flaskServerBaseUrl = 'http://34.132.122.94:5000';
 
-    // Add the new group to the context
-    addVacationGroup(newGroup);
-
-    // After creating the group, you can navigate back to the 'Main' screen
-    navigation.navigate('Main');
+  const generateUniqueID = () => {
+    const timestamp = new Date().getTime();
+    const random = Math.floor(Math.random() * 1000000);
+    return `${timestamp}-${random}`;
   };
+
+
+  const handleCreateGroup = async () => {
+    try {
+      const newGroup = {
+        id: generateUniqueID(),
+        vacationName,
+        startDate,
+        endDate,
+        groupPassword,
+      };
+
+      const groupData = {
+        vacation_title: vacationName,
+        group_password: groupPassword,
+        vacation_start_datetime: startDate,
+        vacation_end_datetime: endDate,
+      };
+
+      console.log('Sending data to server:', groupData);
+
+  
+      // Send data to your Flask server
+      const response = await fetch(`${flaskServerBaseUrl}/api/addGroup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(groupData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+      console.log('Response from Flask:', responseData);
+  
+      addVacationGroup(newGroup);
+      navigation.navigate('Main');
+    } catch (error) {
+      console.error('Error creating group:', error.message);
+    }
+  };
+  
+
 
   return (
     <View style={styles.container}>
