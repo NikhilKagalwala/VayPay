@@ -2,25 +2,39 @@
 
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import auth0 from './../auth0';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
-    try {
-      const credentials = await auth0.auth.passwordRealm({
-        username: email,
-        password: password,
-        realm: 'Username-Password-Authentication', // This may vary based on your Auth0 setup
-      });
+  const flaskServerBaseUrl = 'http://34.132.122.94:5000';
 
-      console.log('Login Successful:', credentials);
-      // Add your logic after successful login
+  const loginUser = async () => {
+    try {
+      const loginCredentials = {
+        email: email,
+        password_hash: password,
+      };
+      // Send login data to your Flask server
+      const response = await fetch(`${flaskServerBaseUrl}/api/validateLogin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginCredentials),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+      console.log('Login Response from Flask:', responseData);
+
+      navigation.navigate('Main');
     } catch (error) {
-      console.error('Login Failed:', error);
-      // Handle login failure
+      console.error('Error logging in:', error.message);
+      navigation.navigate('Main');
     }
   };
 
@@ -46,7 +60,7 @@ const Login = ({ navigation }) => {
         secureTextEntry={true}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity style={styles.button} onPress={loginUser}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 

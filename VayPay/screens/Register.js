@@ -2,7 +2,62 @@
 
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import auth0 from '../auth0';
+
+// Assuming this code is inside a React Native component or utility function
+
+const flaskServerBaseUrl = 'http://34.132.122.94:5000';
+
+// Example function to make a GET request
+const fetchDataFromFlask = async () => {
+  try {
+    const response = await fetch(`${flaskServerBaseUrl}/api/test`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Data from Flask:', data);
+
+    // Perform further actions with the data as needed
+  } catch (error) {
+    console.error('Error fetching data from Flask:', error.message);
+    // Handle the error
+  }
+};
+
+// Example function to make a POST request
+const postDataToFlask = async (data) => {
+  try {
+    const response = await fetch(`${flaskServerBaseUrl}/api/addUser`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        data
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    console.log('Response from Flask:', responseData);
+
+    // Perform further actions with the response data as needed
+  } catch (error) {
+    console.error('Error posting data to Flask:', error.message);
+    // Handle the error
+  }
+};
+
+// Call the functions
+// fetchDataFromFlask();
+// postDataToFlask();
+
+
 
 const Register = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -13,19 +68,20 @@ const Register = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   const handleRegistration = async () => {
-    try {
-      const credentials = await auth0.auth.createUser({
-        email,
-        password,
-        connection: 'Username-Password-Authentication', // This may vary based on your Auth0 setup
-      });
 
-      console.log('Registration Successful:', credentials);
+      const userData = {
+        first_name: firstName,
+        last_name: lastName,
+        phone_number: phoneNumber,
+        country: country,
+        email: email,
+        password_hash: password
+      };
+
+      postDataToFlask(userData);
+      // fetchDataFromFlask();
       // Add your logic after successful registration
-    } catch (error) {
-      console.error('Registration Failed:', error);
-      // Handle registration failure
-    }
+      navigation.navigate('Main');
   };
 
   return (
